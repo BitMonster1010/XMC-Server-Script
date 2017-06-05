@@ -1,0 +1,26 @@
+--==CHANGELOG for XMC Server Script==--
+
+
+--v1.4 (29-04-2017):
+    -Added multiworld supported backups
+
+--v1.3 (28-03-2017):
+    -Added update functionality
+
+--v1.2 (24-03-2017):
+    -Added restore backup functionality
+
+--v1.1 (15-01-2017):
+    -The script won't do a backup if the server's storage device is full
+    -Added output logs in the script
+
+--v1.0 (30-12-2016):
+    -Script can now detect if server is running
+    -Added config file
+
+--Pre-v1.0:
+    November 2015:
+        -Added basic backup, restart and announce functionality
+    28 December 2016 and 29 December 2016:
+        -Improved code and added start and stop functionality
+        -Added version and help for the script
