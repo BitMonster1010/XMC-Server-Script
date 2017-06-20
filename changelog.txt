@@ -1,5 +1,9 @@
 --==CHANGELOG for XMC Server Script==--
 
+--v1.4.1 (18-06-2017):
+    -Fixed a path bug
+    -Script now automatically does a backup before updating/restoring a backup
+    -Improved update input
 
 --v1.4 (29-04-2017):
     -Added multiworld supported backups

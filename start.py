@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 
 import getopt
-import sys
+import sys, os
 import utility, config
 
-sys.path.append("../")
+os.chdir(sys.path[0])
+os.chdir("../")
 
 from server_control import ServerController
 
-version = "v1.4"
-release_date = "29-04-2017"
+version = "v1.4.1-build1"
+release_date = "18-06-2017"
 
 prefix = "XMC: "
 error_prefix = "XMC ERR: "
@@ -21,7 +22,7 @@ def needs_config(opt):
 def usage():
     print("--------------------------------------------------------------")
     print("Usage:                                                        ")
-    print("       -a, --announce {random_message or `proper message`}    ")
+    print("       -a, --announce {random_message or 'proper message'}    ")
     print("           Announce a message                                 ")
     print("       -b, --backup {backup_name}                             ")
     print("           Backup the world file                              ")

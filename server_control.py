@@ -12,19 +12,19 @@ class ServerController:
         self.__console = Console()
         self.worlds = config.worlds
         self.screen_running = utility.is_screen_running(config.screen)
-        os.chdir("../")
 
-    def backup(self, special_name):
+    def backup(self, special_name, include_announce = True):
         free_bytes = utility.get_number_of_free_bytes()
         dir_size = 0
         for x in range(len(self.worlds)):
             dir_size += utility.get_directory_size(os.getcwd() + "/" + self.worlds[x])
         if free_bytes >= dir_size + 2147483648:
-            if special_name == "normal":
-                self.__console.announce("&6Backing up worlds")
-            else:
-                self.__console.announce("&6Backing up worlds as a '" + special_name + "' backup")
-            self.__console.announce("&6Saving the world...")
+            if include_announce:
+                if special_name == "normal":
+                    self.__console.announce("&6Backing up worlds")
+                else:
+                    self.__console.announce("&6Backing up worlds as a '" + special_name + "' backup")
+                self.__console.announce("&6Saving the world...")
             self.__console.save_all()
             if not os.path.exists("backups"):
                 utility.run_command("mkdir backups")
@@ -46,7 +46,8 @@ class ServerController:
             else:
                 utility.run_command("tar -zcvf " + folder_str + backup_name + " " + self.worlds[0])
 
-            self.__console.announce("&6Finished the backup!")
+            if include_announce:
+                self.__console.announce("&6Finished the backup!")
         else:
             utility.xmc_print("XMC ERR: Not enough space left on the device")
             utility.xmc_print("XMC: Aborting backup")
@@ -108,6 +109,8 @@ class ServerController:
             path = "backups/" + path
 
         if os.path.exists(path):
+            self.backup("pre-restore", False)
+
             if self.screen_running:
                 self.__console.announce("&6Restoring backup")
                 time.sleep(2)
@@ -148,13 +151,12 @@ class ServerController:
         utility.xmc_print("Please note that the updates use BuildTools.jar and only contains CraftBukkit and Spigot")
         utility.xmc_print("Make sure you have set the right server tool in xmc_config.cfg")
         utility.xmc_print("Server tool found in the config file: " + config.server_tool)
-        utility.xmc_print("Are you sure you want to continue? (y/dev/n)")
+        utility.xmc_print("Are you sure you want to continue? (y/n)")
         response = input()
         utility.xmc_print("Response: " + response)
-        if response == "y" or response == "dev":
-            devBuild = False;
-            if response == "dev":
-                devBuild = True;
+        utility.xmc_print("Special arguments?")
+        special_args = input()
+        if response == "y":
             utility.xmc_print("Starting update process...")
             self.__console.announce("&6Downloading server updates")
             if not os.path.exists("BuildTools/BuildTools.jar"):
@@ -162,12 +164,17 @@ class ServerController:
                 utility.run_command("wget " + download_link + " -O BuildTools.jar")
                 utility.run_command("mkdir BuildTools")
                 utility.run_command("mv BuildTools.jar BuildTools/BuildTools.jar")
-            if devBuild:
-                self.__console.announce("&6Downloading development build")
-                utility.run_command("java -jar BuildTools/BuildTools.jar --dev")
-            else:
+            if special_args == "--dev":
+                self.__console.announce("&6Downloading development version")
+            elif special_args[:5] == "--rev":
+                more_args = special_args.split(' ')
+                self.__console.announce("&6Downloading version with revision '" + more_args[1] + "'")
+            if special_args == "":
                 utility.run_command("java -jar BuildTools/BuildTools.jar")
+            else:
+                utility.run_command("java -jar BuildTools/BuildTools.jar " + special_args)
 
+            self.backup("pre-update", False)
             self.__console.announce("&6Updating server")
             time.sleep(2)
             self.__console.save_all()
