@@ -1,6 +1,10 @@
 --==CHANGELOG for XMC Server Script==--
 
---v1.4.1 (18-06-2017):
+--v1.5 (22-06-2017):
+    -Changed format on how to save the 'worlds' and 'announce_messages'
+    -Added a new check server command which tells you whether the server
+     is running or not and it shows the last 20 lines of the server screen
+     if it is running
     -Fixed a path bug
     -Script now automatically does a backup before updating/restoring a backup
     -Improved update input

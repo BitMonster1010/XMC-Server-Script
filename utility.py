@@ -19,6 +19,7 @@ def xmc_print(message, is_error=False):
     message = ("{0}" + message).format(error_prefix if is_error else prefix)
     print(message)
     add_to_log(message)
+    return message
 
 
 def add_to_log(message):
@@ -36,3 +37,9 @@ def add_to_log(message):
 def is_screen_running(name):
     var = check_output(["screen -ls; true"], shell=True)
     return bytes("." + name + "\t(", 'UTF-8') in var
+
+def replace_char(str_, replaced_char, replace_with):
+    for letter in str_:
+        if letter == replaced_char:
+            str_ = str_.replace(replaced_char, replace_with)
+    return str_

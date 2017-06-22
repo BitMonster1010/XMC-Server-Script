@@ -2,16 +2,18 @@ import os
 import random
 import sys
 import time
-import utility, config
+import utility
 
+from config import Config, ConfigDefaults
 from console import Console
 from subprocess import getoutput
 
+
 class ServerController:
     def __init__(self):
-        self.__console = Console()
-        self.worlds = config.worlds
-        self.screen_running = utility.is_screen_running(config.screen)
+        self.config = Config()
+        self.__console = Console(self.config.screen, self.config.use_broadcast)
+        self.screen_running = utility.is_screen_running(self.config.screen)
 
     def backup(self, special_name, include_announce=True):
         try:
@@ -32,16 +34,16 @@ class ServerController:
             time_str = time.strftime("%d-%m-%Y_%H-%M")
             backup_name = "backup-" + time_str + ".tar"
 
-            if config.multiworld_support:
+            if self.config.multiworld_support:
 
-                utility.run_command("tar -cvf " + folder_str + backup_name + " " + self.worlds[0])
-                if len(self.worlds) > 1:
-                    for x in range(1, len(self.worlds)):
-                        utility.run_command("tar -uvf " + folder_str + backup_name + " " + self.worlds[x])
+                utility.run_command("tar -cvf " + folder_str + backup_name + " " + self.config.worlds[0])
+                if len(self.config.worlds) > 1:
+                    for x in range(1, len(self.config.worlds)):
+                        utility.run_command("tar -uvf " + folder_str + backup_name + " " + self.config.worlds[x])
                 time.sleep(0.75)
                 utility.run_command("gzip " + folder_str + backup_name)
             else:
-                utility.run_command("tar -zcvf " + folder_str + backup_name + " " + self.worlds[0])
+                utility.run_command("tar -zcvf " + folder_str + backup_name + " " + self.config.worlds[0])
 
             if include_announce:
                 self.__console.announce("&6Finished the backup!")
@@ -86,8 +88,8 @@ class ServerController:
         self.start()
 
     def start(self):
-        utility.run_command("screen -dmS " + config.screen + " " + config.start_server_command)
-        self.screen_running = utility.is_screen_running(config.screen)
+        utility.run_command("screen -LdmS " + self.config.screen + " " + self.config.start_server_command)
+        self.screen_running = utility.is_screen_running(self.config.screen)
         if self.screen_running:
             utility.xmc_print("Server was started")
         else:
@@ -95,8 +97,8 @@ class ServerController:
 
     def announce(self, message):
         if message == "random_message":
-            self.__console.announce("&d" + config.messages[random.randint(0, len(
-                config.messages) - 1)])
+            self.__console.announce("&d" + self.config.messages[random.randint(0, len(
+                self.config.messages) - 1)])
         else:
             self.__console.announce("&d" + message)
 
@@ -115,25 +117,23 @@ class ServerController:
                 time.sleep(2)
                 self.__console.stop()
 
-            archived_files = getoutput("tar -tf " + path + " --exclude '*/*'")
+            archived_files = getoutput("tar -tf " + path + " --exclude '*/*'").split("\n")
 
             for file in archived_files:
-                if os.path.exists(file[:-2]):
+                if os.path.exists(file):
                     utility.run_command("rm -vr " + file[:-2])
 
-            if config.multiworld_support:
+            if self.config.multiworld_support:
                 utility.run_command("tar -zxvf " + path)
             else:
-                archived_files[0] = archived_files[0][:-2]
-
                 archived_name_different = False
-                if archived_files[0] != self.worlds[0]:
+                if archived_files[0] != self.config.worlds[0]:
                     archived_name_different = True
 
                 utility.run_command("tar -zxvf " + path)
 
                 if archived_name_different:
-                    utility.run_command("mv -vT \"" + archived_files[0] + "\" \"" + self.worlds[0] + "\"")
+                    utility.run_command("mv -vT \"" + archived_files[0] + "\" \"" + self.config.worlds[0] + "\"")
 
             time.sleep(1)
             self.start()
@@ -143,7 +143,7 @@ class ServerController:
     def update(self):
         utility.xmc_print("Please note that the updates use BuildTools.jar and only contains CraftBukkit and Spigot")
         utility.xmc_print("Make sure you have set the right server tool in xmc_config.cfg")
-        utility.xmc_print("Server tool found in the config file: " + config.server_tool)
+        utility.xmc_print("Server tool found in the config file: " + self.config.server_tool)
         utility.xmc_print("Are you sure you want to continue? (y/n)")
         response = input()
         utility.xmc_print("Response: " + response)
@@ -174,22 +174,22 @@ class ServerController:
             self.__console.save_all()
             self.__console.stop()
             time.sleep(1.5)
-            utility.run_command("rm " + config.server_jar_name)
+            utility.run_command("rm " + self.config.server_jar_name)
 
-            jar = getoutput("ls *.jar")
+            jar = getoutput("ls *.jar").split("\n")
 
-            if config.server_tool == "craftbukkit":
-                for x in range(len(jar)):
-                    if jar[x][:11] == "craftbukkit":
-                        filepath = jar[x][:-1]
+            if self.config.server_tool == "craftbukkit":
+                for j in jar:
+                    if j[:11] == "craftbukkit":
+                        filepath = j
                         break
-            elif config.server_tool == "spigot":
-                for x in range(len(jar)):
-                    if jar[x][:6] == "spigot":
-                        filepath = jar[x][:-1]
+            elif self.config.server_tool == "spigot":
+                for j in jar:
+                    if j[:6] == "spigot":
+                        filepath = j
                         break
 
-            utility.run_command("mv -f " + filepath + " " + config.server_jar_name)
+            utility.run_command("mv -f " + filepath + " " + self.config.server_jar_name)
 
             self.start()
         else:

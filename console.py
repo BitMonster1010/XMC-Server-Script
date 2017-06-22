@@ -2,11 +2,15 @@ import utility, config
 
 
 class Console:
+    def __init__(self, screen, use_broadcast):
+        self.__screen = screen
+        self.__use_broadcast = use_broadcast
+
     def send_command(self, comm):
         """
         Executes a command in the console.
         """
-        utility.run_command("screen -x " + config.screen + " -X stuff \"" + comm + " $(printf '\r')\"")
+        utility.run_command("screen -x " + self.__screen + " -X stuff \"" + comm + " $(printf '\r')\"")
 
     def say(self, message):
         self.send_command("say " + message)
@@ -15,7 +19,7 @@ class Console:
         self.send_command("broadcast " + message)
 
     def announce(self, message):
-        if config.use_broadcast:
+        if self.__use_broadcast:
             self.broadcast(message)
         else:
             self.say(message[2:])

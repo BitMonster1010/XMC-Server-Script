@@ -8,13 +8,17 @@ os.chdir(sys.path[0])
 os.chdir("../")
 
 from server_control import ServerController
+from subprocess import getoutput
 
-version = "v1.4.1-build1"
-release_date = "18-06-2017"
+VERSION = "v1.5"
+RELEASE_DATE = "22-06-2017"
+AUTHOR = "XxMoNsTeR"
 
 
 def needs_config(opt):
-    return opt in ("-a", "--announce", "-b", "--backup", "-R", "--restore", "-r", "--restart", "-S", "--start", "-s", "--stop", "-U", "--update", "-c", "--check_config")
+    return opt in ("-a", "--announce", "-b", "--backup", "-R", "--restore", "-r",
+                   "--restart", "-S", "--start", "-s", "--stop", "-U", "--update",
+                   "-c", "--check_config", "-e", "--check_server")
 
 def usage():
     print("--------------------------------------------------------------")
@@ -25,6 +29,9 @@ def usage():
     print("           Backup the world file                              ")
     print("       -c, --check_config                                     ")
     print("           Checks if data is correct in the config file       ")
+    print("       -e --check_server                                      ")
+    print("           Shows the last 20 lines of the console output if   ")
+    print("           the server is running                              ")
     print("       -g, --generate_config                                  ")
     print("           Generate a new config file (overwrites old one)    ")
     print("       -h, --help                                             ")
@@ -49,17 +56,14 @@ def main(argv):
     server_controller = ServerController()
 
     try:
-        opts, args = getopt.getopt(argv, "hSUgcvb:R:r:s:a:", ["help", "start", "generate_config", "check_config", "version", "update", "backup=", "restore=", "restart=", "stop=", "announce="])
+        opts, args = getopt.getopt(argv, "hSUegcvb:R:r:s:a:", ["help", "start", "update", "check_server", "generate_config", "check_config", "version", "backup=", "restore=", "restart=", "stop=", "announce="])
     except getopt.GetoptError:
         utility.xmc_print("Invalid argument", True)
         utility.xmc_print("Please use -h or --help for usage")
         sys.exit()
     for opt, arg in opts:
-        if needs_config(opt):
-            config.load_config()
-            server_controller.worlds = config.worlds
-            screen_running = utility.is_screen_running(config.screen)
-            server_controller.screen_running = screen_running
+        try:
+            screen_running = server_controller.screen_running
 
             if opt in ("-b", "--backup"):
                 if screen_running:
@@ -88,30 +92,39 @@ def main(argv):
                     utility.xmc_print("Server is not started", True)
             elif opt in ("-c", "--check_config"):
                 print("Worlds: ")
-                for world in config.worlds:
+                for world in server_controller.config.worlds:
                     print("   " + world)
-                print("Screen: " + config.screen)
-                print("Start Server Command: " + config.start_server_command)
-                print("Use Broadcast: " + str(config.use_broadcast))
-                print("Multiworld Support: " + str(config.multiworld_support))
+                print("Screen: " + server_controller.config.screen)
+                print("Start Server Command: " + server_controller.config.start_server_command)
+                print("Use Broadcast: " + str(server_controller.config.use_broadcast))
+                print("Multiworld Support: " + str(server_controller.config.multiworld_support))
                 print("Messages: ")
-                for message in config.messages:
+                for message in server_controller.config.messages:
                     print("   " + message)
-                print("Server Tool: " + config.server_tool)
-                print("Server Jar Name: " + config.server_jar_name)
+                print("Server Tool: " + server_controller.config.server_tool)
+                print("Server Jar Name: " + server_controller.config.server_jar_name)
             elif opt in ("-R", "--restore"):
                 server_controller.restore(arg)
             elif opt in ("-U", "--update"):
                 server_controller.update()
-        else:
-            if opt in ("-h", "--help"):
-                usage()
-            elif opt in ("-v", "--version"):
-                print("XMC Server Script " + version)
-                print("Release Date: " + release_date)
-                print("Author: XxMoNsTeR")
-            elif opt in ("-g", "--generate_config"):
-                config.generate_config()
+            elif opt in ("-e", "--check_server"):
+                if screen_running:
+                    utility.xmc_print("Server is running")
+                    utility.xmc_print("Here are the last 20 lines of the Console Output:")
+                    utility.xmc_print(getoutput("tail -20 screenlog.0"))
+                else:
+                    utility.xmc_print("Server is not running")
+        except config.ConfigException as e:
+            utility.xmc_print(e)
+
+        if opt in ("-h", "--help"):
+            usage()
+        elif opt in ("-v", "--version"):
+            print("XMC Server Script " + VERSION)
+            print("Release Date: " + RELEASE_DATE)
+            print("Author: " + AUTHOR)
+        elif opt in ("-g", "--generate_config"):
+            server_controller.config.generate_config(config.ConfigDefaults.config_file)
 
 
 if __name__ == "__main__":
