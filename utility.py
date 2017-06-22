@@ -15,7 +15,8 @@ def run_command(command):
     add_to_log(output)
 
 
-def xmc_print(message):
+def xmc_print(message, is_error=False):
+    message = ("{0}" + message).format(error_prefix if is_error else prefix)
     print(message)
     add_to_log(message)
 
@@ -30,34 +31,6 @@ def add_to_log(message):
             f.write("====================================XMC LOG START===========================\n")
         f.write("[" + time_stamp + "]: " + message + "\n")
         f.close()
-
-
-def get_directory_size(path):
-    total_size = 0
-    seen = set()
-
-    for dirpath, dirnames, filenames in os.walk(path):
-        for f in filenames:
-            fp = os.path.join(dirpath, f)
-
-            try:
-                stat = os.stat(fp)
-            except OSError:
-                continue
-
-            if stat.st_ino in seen:
-                continue
-
-            seen.add(stat.st_ino)
-
-            total_size += stat.st_size
-
-    return total_size
-
-
-def get_number_of_free_bytes():
-    statvfs = os.statvfs("/")
-    return statvfs.f_frsize * statvfs.f_bavail
 
 
 def is_screen_running(name):

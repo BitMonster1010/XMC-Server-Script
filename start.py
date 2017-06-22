@@ -12,9 +12,6 @@ from server_control import ServerController
 version = "v1.4.1-build1"
 release_date = "18-06-2017"
 
-prefix = "XMC: "
-error_prefix = "XMC ERR: "
-
 
 def needs_config(opt):
     return opt in ("-a", "--announce", "-b", "--backup", "-R", "--restore", "-r", "--restart", "-S", "--start", "-s", "--stop", "-U", "--update", "-c", "--check_config")
@@ -54,8 +51,8 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv, "hSUgcvb:R:r:s:a:", ["help", "start", "generate_config", "check_config", "version", "update", "backup=", "restore=", "restart=", "stop=", "announce="])
     except getopt.GetoptError:
-        utility.xmc_print(error_prefix + "Invalid argument")
-        utility.xmc_print(prefix + "Please use -h or --help for usage")
+        utility.xmc_print("Invalid argument", True)
+        utility.xmc_print("Please use -h or --help for usage")
         sys.exit()
     for opt, arg in opts:
         if needs_config(opt):
@@ -68,12 +65,12 @@ def main(argv):
                 if screen_running:
                     server_controller.backup(arg)
                 else:
-                    utility.xmc_print(error_prefix + "Server is not started")
+                    utility.xmc_print("Server is not started", True)
             elif opt in ("-S", "--start"):
                 if not screen_running:
                     server_controller.start()
                 else:
-                    utility.xmc_print(error_prefix + "Server is already started")
+                    utility.xmc_print("Server is already started", True)
             elif opt in ("-r", "--restart"):
                 if screen_running:
                     server_controller.restart(int(arg))
@@ -83,23 +80,23 @@ def main(argv):
                 if screen_running:
                     server_controller.stop(int(arg))
                 else:
-                    utility.xmc_print(error_prefix + "Server is already stopped")
+                    utility.xmc_print("Server is already stopped", True)
             elif opt in ("-a", "--announce"):
                 if screen_running:
                     server_controller.announce(arg)
                 else:
-                    utility.xmc_print(error_prefix + "Server is not started")
+                    utility.xmc_print("Server is not started", True)
             elif opt in ("-c", "--check_config"):
                 print("Worlds: ")
-                for x in range(len(config.worlds)):
-                    print("   " + config.worlds[x])
+                for world in config.worlds:
+                    print("   " + world)
                 print("Screen: " + config.screen)
                 print("Start Server Command: " + config.start_server_command)
                 print("Use Broadcast: " + str(config.use_broadcast))
                 print("Multiworld Support: " + str(config.multiworld_support))
                 print("Messages: ")
-                for x in range(len(config.messages)):
-                    print("   " + config.messages[x])
+                for message in config.messages:
+                    print("   " + message)
                 print("Server Tool: " + config.server_tool)
                 print("Server Jar Name: " + config.server_jar_name)
             elif opt in ("-R", "--restore"):

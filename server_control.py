@@ -5,7 +5,7 @@ import time
 import utility, config
 
 from console import Console
-
+from subprocess import getoutput
 
 class ServerController:
     def __init__(self):
@@ -13,12 +13,9 @@ class ServerController:
         self.worlds = config.worlds
         self.screen_running = utility.is_screen_running(config.screen)
 
-    def backup(self, special_name, include_announce = True):
-        free_bytes = utility.get_number_of_free_bytes()
-        dir_size = 0
-        for x in range(len(self.worlds)):
-            dir_size += utility.get_directory_size(os.getcwd() + "/" + self.worlds[x])
-        if free_bytes >= dir_size + 2147483648:
+    def backup(self, special_name, include_announce=True):
+        try:
+            utility.xmc_print("Backing up worlds")
             if include_announce:
                 if special_name == "normal":
                     self.__console.announce("&6Backing up worlds")
@@ -48,9 +45,11 @@ class ServerController:
 
             if include_announce:
                 self.__console.announce("&6Finished the backup!")
-        else:
-            utility.xmc_print("XMC ERR: Not enough space left on the device")
-            utility.xmc_print("XMC: Aborting backup")
+            utility.xmc_print("Successfully backed up worlds!")
+        except IOError as e:
+            utility.xmc_print("An unexpected I/O error has occured!", True)
+            utility.xmc_print(e, True)
+            utility.xmc_print("Aborting backup!")
             sys.exit()
 
     def stop(self, time_to_stop):
@@ -79,7 +78,7 @@ class ServerController:
         self.__console.save_all()
         self.__console.stop()
 
-        utility.xmc_print("XMC: Server was stopped")
+        utility.xmc_print("Server was stopped")
 
     def restart(self, time_to_restart):
         self.__console.announce("&7Server is restarting")
@@ -90,9 +89,9 @@ class ServerController:
         utility.run_command("screen -dmS " + config.screen + " " + config.start_server_command)
         self.screen_running = utility.is_screen_running(config.screen)
         if self.screen_running:
-            utility.xmc_print("XMC: Server was started")
+            utility.xmc_print("Server was started")
         else:
-            utility.xmc_print("XMC ERR: Failed to start server")
+            utility.xmc_print("Failed to start server", True)
 
     def announce(self, message):
         if message == "random_message":
@@ -116,17 +115,11 @@ class ServerController:
                 time.sleep(2)
                 self.__console.stop()
 
-            utility.run_command("tar -tf " + path + " --exclude '*/*' > archive-check.tmp")
+            archived_files = getoutput("tar -tf " + path + " --exclude '*/*'")
 
-            f = open("archive-check.tmp", "r")
-            archived_files = f.readlines()
-            f.close()
-
-            utility.run_command("rm archive-check.tmp")
-
-            for x in range(len(archived_files)):
-                if os.path.exists(archived_files[x][:-2]):
-                    utility.run_command("rm -vr " + archived_files[x][:-2])
+            for file in archived_files:
+                if os.path.exists(file[:-2]):
+                    utility.run_command("rm -vr " + file[:-2])
 
             if config.multiworld_support:
                 utility.run_command("tar -zxvf " + path)
@@ -145,7 +138,7 @@ class ServerController:
             time.sleep(1)
             self.start()
         else:
-            utility.xmc_print("XMC ERR: Backup file doesn't exist")
+            utility.xmc_print("Backup file doesn't exist", True)
 
     def update(self):
         utility.xmc_print("Please note that the updates use BuildTools.jar and only contains CraftBukkit and Spigot")
@@ -154,9 +147,10 @@ class ServerController:
         utility.xmc_print("Are you sure you want to continue? (y/n)")
         response = input()
         utility.xmc_print("Response: " + response)
-        utility.xmc_print("Special arguments?")
-        special_args = input()
         if response == "y":
+            utility.xmc_print("Special arguments?")
+            special_args = input()
+            utility.xmc_print("Response: " + special_args)
             utility.xmc_print("Starting update process...")
             self.__console.announce("&6Downloading server updates")
             if not os.path.exists("BuildTools/BuildTools.jar"):
@@ -167,7 +161,7 @@ class ServerController:
             if special_args == "--dev":
                 self.__console.announce("&6Downloading development version")
             elif special_args[:5] == "--rev":
-                more_args = special_args.split(' ')
+                more_args = special_args.split()
                 self.__console.announce("&6Downloading version with revision '" + more_args[1] + "'")
             if special_args == "":
                 utility.run_command("java -jar BuildTools/BuildTools.jar")
@@ -182,13 +176,7 @@ class ServerController:
             time.sleep(1.5)
             utility.run_command("rm " + config.server_jar_name)
 
-            utility.run_command("ls *.jar > jar-check.tmp")
-
-            f = open("jar-check.tmp", "r")
-            jar = f.readlines()
-            f.close()
-
-            utility.run_command("rm jar-check.tmp")
+            jar = getoutput("ls *.jar")
 
             if config.server_tool == "craftbukkit":
                 for x in range(len(jar)):
