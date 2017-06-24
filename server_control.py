@@ -48,6 +48,7 @@ class ServerController:
             if include_announce:
                 self.__console.announce("&6Finished the backup!")
             utility.xmc_print("Successfully backed up worlds!")
+            utility.xmc_print("The backup restore path is: '" + folder_str + backup_name + ".gz'")
         except IOError as e:
             utility.xmc_print("An unexpected I/O error has occured!", True)
             utility.xmc_print(e, True)
@@ -96,11 +97,14 @@ class ServerController:
             utility.xmc_print("Failed to start server", True)
 
     def announce(self, message):
+        msg = ""
         if message == "random_message":
-            self.__console.announce("&d" + self.config.messages[random.randint(0, len(
-                self.config.messages) - 1)])
+            msg = self.config.messages[random.randint(0, len(self.config.messages) - 1)]
+            self.__console.announce("&d" + msg)
         else:
-            self.__console.announce("&d" + message)
+            msg = message
+            self.__console.announce("&d" + msg)
+        utility.xmc_print("Announced message: '" + msg + "'")
 
     def restore(self, path):
         if path[-7:] != ".tar.gz":
@@ -110,6 +114,7 @@ class ServerController:
             path = "backups/" + path
 
         if os.path.exists(path):
+            utility.xmc_print("A backup is being restored")
             self.backup("pre-restore", False)
 
             if self.screen_running:
