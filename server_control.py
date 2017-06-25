@@ -15,7 +15,7 @@ class ServerController:
         self.__console = Console(self.config.screen, self.config.use_broadcast)
         self.screen_running = utility.is_screen_running(self.config.screen)
 
-    def backup(self, special_name, include_announce=True):
+    def backup(self, special_name="normal", include_announce=True):
         try:
             utility.xmc_print("Backing up worlds")
             if include_announce:
@@ -98,7 +98,7 @@ class ServerController:
 
     def announce(self, message):
         msg = ""
-        if message == "random_message":
+        if message == "":
             msg = self.config.messages[random.randint(0, len(self.config.messages) - 1)]
             self.__console.announce("&d" + msg)
         else:
