@@ -89,7 +89,7 @@ class ServerController:
         self.start()
 
     def start(self):
-        utility.run_command("screen -LdmS " + self.config.screen + " " + self.config.start_server_command)
+        utility.run_command("screen -L xmc-screen.log -dmS " + self.config.screen + " " + self.config.start_server_command)
         self.screen_running = utility.is_screen_running(self.config.screen)
         if self.screen_running:
             utility.xmc_print("Server was started")

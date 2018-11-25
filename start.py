@@ -115,7 +115,7 @@ def main(argv):
                 if screen_running:
                     utility.xmc_print("Server is running")
                     utility.xmc_print("Here are the last 20 lines of the Console Output:")
-                    utility.xmc_print(getoutput("tail -20 screenlog.0"))
+                    utility.xmc_print(getoutput("tail -20 xmc-screen.log"))
                 else:
                     utility.xmc_print("Server is not running")
         except config.ConfigException as e:
