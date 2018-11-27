@@ -10,13 +10,13 @@ class Console:
         """
         Executes a command in the console.
         """
-        utility.run_command("screen -x " + self.__screen + " -X stuff \"" + comm + " $(printf '\r')\"")
+        utility.run_command("screen -x {0} -X stuff \"{1} $(printf '\r')\"".format(self.__screen, comm))
 
     def say(self, message):
-        self.send_command("say " + message)
+        self.send_command("say {0}".format(message))
 
     def broadcast(self, message):
-        self.send_command("broadcast " + message)
+        self.send_command("broadcast {0}".format(message))
 
     def announce(self, message):
         if self.__use_broadcast:

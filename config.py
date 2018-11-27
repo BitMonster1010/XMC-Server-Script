@@ -24,6 +24,7 @@ class ConfigDefaults:
     messages = ["message1", "message2"]
     server_tool = "craftbukkit"
     server_jar_name = "minecraft_server.jar"
+    datetime_format = "%Y-%m-%d_%H-%M"
 
     config_file = "xmc_server_script/xmc_config.cfg"
 
@@ -49,6 +50,7 @@ class Config:
                 self.messages = json.loads(self.messages)
             self.server_tool = c.get('data', 'server_tool', fallback=ConfigDefaults.server_tool)
             self.server_jar_name = c.get('data', 'server_jar_name', fallback=ConfigDefaults.server_jar_name)
+            self.datetime_format = c.get('data', 'datetime_format', fallback=ConfigDefaults.datetime_format)
 
             f.close()
         except FileNotFoundError:
@@ -70,14 +72,15 @@ class Config:
 
             f.writelines(
                 ["[data]\n",
-                 "worlds = " + utility.replace_char(str(ConfigDefaults.worlds), "'", "\"") + "\n",
-                 "screen = " + ConfigDefaults.screen + "\n",
-                 "start_server_command = " + ConfigDefaults.start_server_command + "\n",
-                 "use_broadcast = " + str(ConfigDefaults.use_broadcast) + "\n",
-                 "multiworld_support = " + str(ConfigDefaults.multiworld_support) + "\n",
-                 "announce_messages = " + utility.replace_char(str(ConfigDefaults.messages), "'", "\"") + "\n",
-                 "server_tool = " + ConfigDefaults.server_tool + "\n",
-                 "server_jar_name = " + ConfigDefaults.server_jar_name + "\n\n",
+                 "worlds = {0}\n".format(utility.replace_char(str(ConfigDefaults.worlds), "'", "\"")),
+                 "screen = {0}\n".format(ConfigDefaults.screen),
+                 "start_server_command = {0}\n".format(ConfigDefaults.start_server_command),
+                 "use_broadcast = {0}\n".format(str(ConfigDefaults.use_broadcast)),
+                 "multiworld_support = {0}\n".format(str(ConfigDefaults.multiworld_support)),
+                 "announce_messages = {0}\n".format(utility.replace_char(str(ConfigDefaults.messages), "'", "\"")),
+                 "server_tool = {0}\n".format(ConfigDefaults.server_tool),
+                 "server_jar_name = {0}\n".format(ConfigDefaults.server_jar_name),
+                 "datetime_format = {0}\n\n".format(ConfigDefaults.datetime_format),
                  "#Available options for 'server_tool' are 'craftbukkit' and 'spigot'\n",
                  "#Please use consistent names for your server jar file, otherwise the update script might not work properly\n"]
             )

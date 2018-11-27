@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
 import getopt
-import sys, os
-import utility, config
+import sys
+import os
+import time
+import utility
+import config
 
 os.chdir(sys.path[0])
 os.chdir("../")
@@ -10,8 +13,8 @@ os.chdir("../")
 from server_control import ServerController
 from subprocess import getoutput
 
-VERSION = "v1.5"
-RELEASE_DATE = "22-06-2017"
+VERSION = "v1.6-dev"
+RELEASE_DATE = "2018-11-27"
 AUTHOR = "XxMoNsTeR"
 
 
@@ -19,6 +22,7 @@ def needs_config(opt):
     return opt in ("-a", "--announce", "-b", "--backup", "-R", "--restore", "-r",
                    "--restart", "-S", "--start", "-s", "--stop", "-U", "--update",
                    "-c", "--check_config", "-e", "--check_server")
+
 
 def usage():
     print("--------------------------------------------------------------")
@@ -86,7 +90,7 @@ def main(argv):
                     server_controller.start(0 if args == '' else int(args))
             elif opt in ("-s", "--stop"):
                 if screen_running:
-                    server_controller.stop(0 )
+                    server_controller.stop(0 if args == '' else int(args))
                 else:
                     utility.xmc_print("Server is already stopped", True)
             elif opt in ("-a", "--announce"):
@@ -97,16 +101,17 @@ def main(argv):
             elif opt in ("-c", "--check_config"):
                 print("Worlds: ")
                 for world in server_controller.config.worlds:
-                    print("   " + world)
-                print("Screen: " + server_controller.config.screen)
-                print("Start Server Command: " + server_controller.config.start_server_command)
-                print("Use Broadcast: " + str(server_controller.config.use_broadcast))
-                print("Multiworld Support: " + str(server_controller.config.multiworld_support))
+                    print("   {0}".format(world))
+                print("Screen: {0}".format(server_controller.config.screen))
+                print("Start Server Command: {0}".format(server_controller.config.start_server_command))
+                print("Use Broadcast: {0}".format(str(server_controller.config.use_broadcast)))
+                print("Multiworld Support: {0}".format(str(server_controller.config.multiworld_support)))
                 print("Messages: ")
                 for message in server_controller.config.messages:
-                    print("   " + message)
-                print("Server Tool: " + server_controller.config.server_tool)
-                print("Server Jar Name: " + server_controller.config.server_jar_name)
+                    print("   {0}".format(message))
+                print("Server Tool: {0}".format(server_controller.config.server_tool))
+                print("Server Jar Name: {0}".format(server_controller.config.server_jar_name))
+                print("Date-Time Format: {0}".format(time.strftime(server_controller.config.datetime_format)))
             elif opt in ("-R", "--restore"):
                 server_controller.restore(arg)
             elif opt in ("-U", "--update"):
@@ -124,9 +129,9 @@ def main(argv):
         if opt in ("-h", "--help"):
             usage()
         elif opt in ("-v", "--version"):
-            print("XMC Server Script " + VERSION)
-            print("Release Date: " + RELEASE_DATE)
-            print("Author: " + AUTHOR)
+            print("XMC Server Script {0}".format(VERSION))
+            print("Release Date: {0}".format(RELEASE_DATE))
+            print("Author: {0}".format(AUTHOR))
         elif opt in ("-g", "--generate_config"):
             server_controller.config.generate_config(config.ConfigDefaults.config_file)
 
