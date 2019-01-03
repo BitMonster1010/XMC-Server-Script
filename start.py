@@ -13,8 +13,8 @@ os.chdir("../")
 from server_control import ServerController
 from subprocess import getoutput
 
-VERSION = "v1.6-dev"
-RELEASE_DATE = "2018-11-27"
+VERSION = "v1.6-dev2"
+RELEASE_DATE = "2019-01-03"
 AUTHOR = "XxMoNsTeR"
 
 
@@ -87,7 +87,7 @@ def main(argv):
                 if screen_running:
                     server_controller.restart(0 if args == '' else int(args))
                 else:
-                    server_controller.start(0 if args == '' else int(args))
+                    server_controller.start()
             elif opt in ("-s", "--stop"):
                 if screen_running:
                     server_controller.stop(0 if args == '' else int(args))

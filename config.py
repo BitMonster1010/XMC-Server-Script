@@ -24,9 +24,10 @@ class ConfigDefaults:
     messages = ["message1", "message2"]
     server_tool = "craftbukkit"
     server_jar_name = "minecraft_server.jar"
+    sort_backups = True
     datetime_format = "%Y-%m-%d_%H-%M"
 
-    config_file = "xmc_server_script/xmc_config.cfg"
+    config_file = "xmc/xmc_config.cfg"
 
 
 class Config:
@@ -51,6 +52,7 @@ class Config:
             self.server_tool = c.get('data', 'server_tool', fallback=ConfigDefaults.server_tool)
             self.server_jar_name = c.get('data', 'server_jar_name', fallback=ConfigDefaults.server_jar_name)
             self.datetime_format = c.get('data', 'datetime_format', fallback=ConfigDefaults.datetime_format)
+            self.sort_backups = c.get('data', 'sort_backups', fallback=ConfigDefaults.sort_backups)
 
             f.close()
         except FileNotFoundError:
@@ -80,7 +82,8 @@ class Config:
                  "announce_messages = {0}\n".format(utility.replace_char(str(ConfigDefaults.messages), "'", "\"")),
                  "server_tool = {0}\n".format(ConfigDefaults.server_tool),
                  "server_jar_name = {0}\n".format(ConfigDefaults.server_jar_name),
-                 "datetime_format = {0}\n\n".format(ConfigDefaults.datetime_format),
+                 "datetime_format = {0}\n".format(ConfigDefaults.datetime_format),
+                 "sort_backups = {0}\n\n".format(ConfigDefaults.sort_backups),
                  "#Available options for 'server_tool' are 'craftbukkit' and 'spigot'\n",
                  "#Please use consistent names for your server jar file, otherwise the update script might not work properly\n"]
             )

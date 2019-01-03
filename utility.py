@@ -24,10 +24,10 @@ def xmc_print(message, is_error=False):
 
 def add_to_log(message):
     time_stamp = time.strftime("%Y-%m-%d_%H:%M:%S")
-    if not os.path.exists("xmc_server_script/logs"):
-        os.system("mkdir xmc_server_script/logs")
+    if not os.path.exists("xmc/logs"):
+        os.system("mkdir xmc/logs")
     if message != "":
-        f = open("xmc_server_script/logs/xmc-{0}.log".format(initial_time_stamp), 'a+')
+        f = open("xmc/logs/xmc-{0}.log".format(initial_time_stamp), 'a+')
         if f.tell() == 0:
             f.write("====================================XMC LOG START===========================\n")
         f.write("[{0}]: {1}\n".format(time_stamp, message))

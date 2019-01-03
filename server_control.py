@@ -34,6 +34,16 @@ class ServerController:
             time_str = time.strftime(self.config.datetime_format)
             backup_name = "backup-{0}.tar".format(time_str)
 
+            if self.config.sort_backups:
+                year = time.strftime("%Y")
+                month = time.strftime("%m")
+                if not os.path.exists("backups/{0}/{1}".format(special_name, year)):
+                    utility.run_command("mkdir backups/{0}/{1}".format(special_name, year))
+                if not os.path.exists("backups/{0}/{1}/{2}".format(special_name, year, month)):
+                    utility.run_command("mkdir backups/{0}/{1}/{2}".format(special_name, year, month))
+
+                folder_str = "backups/{0}/{1}/{2}/".format(special_name, year, month)
+
             if self.config.multiworld_support:
 
                 utility.run_command("tar -cvf {0}{1} {2}".format(folder_str, backup_name, self.config.worlds[0]))
@@ -97,7 +107,6 @@ class ServerController:
             utility.xmc_print("Failed to start server", True)
 
     def announce(self, message):
-        msg = ""
         if message == "":
             msg = self.config.messages[random.randint(0, len(self.config.messages) - 1)]
             self.__console.announce("&d{0}".format(msg))
@@ -168,10 +177,6 @@ class ServerController:
             elif special_args[:5] == "--rev":
                 more_args = special_args.split()
                 self.__console.announce("&6Downloading version with revision '{0}'".format(more_args[1]))
-            if special_args == "":
-                utility.run_command("java -jar BuildTools/BuildTools.jar")
-            else:
-                utility.run_command("java -jar BuildTools/BuildTools.jar {0}".format(special_args))
 
             self.backup("pre-update", False)
             self.__console.announce("&6Updating server")
@@ -181,6 +186,7 @@ class ServerController:
             time.sleep(1.5)
             utility.run_command("rm {0}".format(self.config.server_jar_name))
 
+            filepath = ""
             jar = getoutput("ls *.jar").split("\n")
 
             if self.config.server_tool == "craftbukkit":
@@ -194,7 +200,10 @@ class ServerController:
                         filepath = j
                         break
 
-            utility.run_command("mv -f {0} {1}".format(filepath, self.config.server_jar_name))
+            if filepath != "":
+                utility.run_command("mv -f {0} {1}".format(filepath, self.config.server_jar_name))
+            else:
+                utility.xmc_print("Unable to find the server jar and rename it!", True)
 
             self.start()
         else:
