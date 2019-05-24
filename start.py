@@ -111,6 +111,7 @@ def main(argv):
                     print("   {0}".format(message))
                 print("Server Tool: {0}".format(server_controller.config.server_tool))
                 print("Server Jar Name: {0}".format(server_controller.config.server_jar_name))
+                print("Sort Backups: {0}".format(str(server_controller.config.sort_backups)))
                 print("Date-Time Format: {0}".format(time.strftime(server_controller.config.datetime_format)))
             elif opt in ("-R", "--restore"):
                 server_controller.restore(arg)

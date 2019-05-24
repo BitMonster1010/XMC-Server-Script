@@ -178,6 +178,11 @@ class ServerController:
                 more_args = special_args.split()
                 self.__console.announce("&6Downloading version with revision '{0}'".format(more_args[1]))
 
+            if special_args == "":
+                utility.run_command("java -jar BuildTools/BuildTools.jar")
+            else:
+                utility.run_command("java -jar BuildTools/BuildTools.jar {0}".format(special_args))
+
             self.backup("pre-update", False)
             self.__console.announce("&6Updating server")
             time.sleep(2)
