@@ -4,7 +4,7 @@ import sys
 import time
 import utility
 
-from config import Config, ConfigDefaults
+from config import Config
 from console import Console
 from subprocess import getoutput
 
@@ -20,10 +20,10 @@ class ServerController:
             utility.xmc_print("Backing up worlds")
             if include_announce:
                 if special_name == "normal":
-                    self.__console.announce("&6Backing up worlds")
+                    self.__console.announce(self.config.l_backup);
                 else:
-                    self.__console.announce("&6Backing up worlds as a '{0}' backup".format(special_name))
-                self.__console.announce("&6Saving the world...")
+                    self.__console.announce(self.config.l_backup_as.format(special_name))
+                self.__console.announce(self.config.l_saving_world)
             self.__console.save_all()
             if not os.path.exists("backups"):
                 utility.run_command("mkdir backups")
@@ -31,7 +31,7 @@ class ServerController:
                 utility.run_command("mkdir backups/{0}".format(special_name))
 
             folder_str = "backups/{0}/".format(special_name)
-            time_str = time.strftime(self.config.datetime_format)
+            time_str = time.strftime(self.config.l_datetime_format)
             backup_name = "backup-{0}.tar".format(time_str)
 
             if self.config.sort_backups:
@@ -56,7 +56,7 @@ class ServerController:
                 utility.run_command("tar -zcvf {0}{1] {2}".format(folder_str, backup_name, self.config.worlds[0]))
 
             if include_announce:
-                self.__console.announce("&6Finished the backup!")
+                self.__console.announce(self.config.l_backup_finished)
             utility.xmc_print("Successfully backed up worlds!")
             utility.xmc_print("The backup restore path is: '{0}{1}.gz'".format(folder_str, backup_name))
         except IOError as e:
@@ -67,7 +67,7 @@ class ServerController:
 
     def stop(self, time_to_stop):
         time_left = time_to_stop
-        self.__console.announce("&7Stopping server in {0} seconds...".format(str(time_to_stop)))
+        self.__console.announce(self.config.l_stopping.format(str(time_to_stop), '' if time_to_stop == 1 else 's'))
         for x in range(time_to_stop):
             time.sleep(1)
             time_left -= 1
@@ -83,10 +83,7 @@ class ServerController:
                 show_timer = True
 
             if show_timer:
-                if time_left != 1:
-                    self.__console.announce("&7Stopping server in {0} seconds...".format(str(time_left)))
-                else:
-                    self.__console.announce("&7Stopping server in 1 second...")
+                self.__console.announce(self.config.l_stopping.format(str(time_left), '' if time_left == 1 else 's'))
 
         self.__console.save_all()
         self.__console.stop()
@@ -94,7 +91,7 @@ class ServerController:
         utility.xmc_print("Server was stopped")
 
     def restart(self, time_to_restart):
-        self.__console.announce("&7Server is restarting")
+        self.__console.announce(self.config.l_restart)
         self.stop(time_to_restart)
         self.start()
 
@@ -127,7 +124,7 @@ class ServerController:
             self.backup("pre-restore", False)
 
             if self.screen_running:
-                self.__console.announce("&6Restoring backup")
+                self.__console.announce(self.config.l_restoring_backup)
                 time.sleep(2)
                 self.__console.stop()
 
@@ -166,17 +163,17 @@ class ServerController:
             special_args = input()
             utility.xmc_print("Response: {0}".format(special_args))
             utility.xmc_print("Starting update process...")
-            self.__console.announce("&6Downloading server updates")
+            self.__console.announce(self.config.l_downloading_updates)
             if not os.path.exists("BuildTools/BuildTools.jar"):
                 download_link = "\"https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar\""
                 utility.run_command("wget {0} -O BuildTools.jar".format(download_link))
                 utility.run_command("mkdir BuildTools")
                 utility.run_command("mv BuildTools.jar BuildTools/BuildTools.jar")
             if special_args == "--dev":
-                self.__console.announce("&6Downloading development version")
+                self.__console.announce(self.config.l_downloading_development_version)
             elif special_args[:5] == "--rev":
                 more_args = special_args.split()
-                self.__console.announce("&6Downloading version with revision '{0}'".format(more_args[1]))
+                self.__console.announce(self.config.l_downloading_version_with_revision.format(more_args[1]))
 
             if special_args == "":
                 utility.run_command("java -jar BuildTools/BuildTools.jar")
@@ -184,7 +181,7 @@ class ServerController:
                 utility.run_command("java -jar BuildTools/BuildTools.jar {0}".format(special_args))
 
             self.backup("pre-update", False)
-            self.__console.announce("&6Updating server")
+            self.__console.announce(self.config.l_updating)
             time.sleep(2)
             self.__console.save_all()
             self.__console.stop()
