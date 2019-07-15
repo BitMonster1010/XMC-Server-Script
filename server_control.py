@@ -25,24 +25,27 @@ class ServerController:
                     self.__console.announce(self.config.l_backup_as.format(special_name))
                 self.__console.announce(self.config.l_saving_world)
             self.__console.save_all()
-            if not os.path.exists("backups"):
-                utility.run_command("mkdir backups")
-            if not os.path.exists("backups/{0}".format(special_name)):
-                utility.run_command("mkdir backups/{0}".format(special_name))
+            if not os.path.exists(self.config.backup_folder):
+                utility.run_command("mkdir -p {0}".format(self.config.backup_folder))
+            path_with_special_name = "{0}/{1}".format(self.config.backup_folder, special_name)
+            if not os.path.exists(path_with_special_name):
+                utility.run_command("mkdir {0}".format(path_with_special_name))
 
-            folder_str = "backups/{0}/".format(special_name)
+            folder_str = path_with_special_name + "/"
             time_str = time.strftime(self.config.l_datetime_format)
             backup_name = "backup-{0}.tar".format(time_str)
 
             if self.config.sort_backups:
                 year = time.strftime("%Y")
                 month = time.strftime("%m")
-                if not os.path.exists("backups/{0}/{1}".format(special_name, year)):
-                    utility.run_command("mkdir backups/{0}/{1}".format(special_name, year))
-                if not os.path.exists("backups/{0}/{1}/{2}".format(special_name, year, month)):
-                    utility.run_command("mkdir backups/{0}/{1}/{2}".format(special_name, year, month))
+                path_with_year = "{0}/{1}/{2}".format(self.config.backup_folder, special_name, year)
+                if not os.path.exists(path_with_year):
+                    utility.run_command("mkdir {0}".format(path_with_year))
+                path_with_year_and_month = "{0}/{1}".format(path_with_year, month)
+                if not os.path.exists(path_with_year_and_month):
+                    utility.run_command("mkdir {0}".format(path_with_year_and_month))
 
-                folder_str = "backups/{0}/{1}/{2}/".format(special_name, year, month)
+                folder_str = path_with_year_and_month + "/"
 
             if self.config.multiworld_support:
 

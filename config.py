@@ -24,6 +24,7 @@ class ConfigDefaults:
     messages = ["message1", "message2"]
     server_tool = "craftbukkit"
     server_jar_name = "minecraft_server.jar"
+    backup_folder = "backups"
     sort_backups = True
 
     l_datetime_format = "%Y-%m-%d_%H-%M"
@@ -63,6 +64,7 @@ class Config:
                 self.messages = json.loads(self.messages)
             self.server_tool = c.get('data', 'server_tool', fallback=ConfigDefaults.server_tool)
             self.server_jar_name = c.get('data', 'server_jar_name', fallback=ConfigDefaults.server_jar_name)
+            self.backup_folder = c.get('data', 'backup_folder', fallback=ConfigDefaults.backup_folder)
             self.sort_backups = c.get('data', 'sort_backups', fallback=ConfigDefaults.sort_backups)
 
             self.l_datetime_format = c.get('localization', 'datetime_format', fallback=ConfigDefaults.l_datetime_format)
@@ -108,7 +110,7 @@ class Config:
                  "announce_messages = {0}\n".format(utility.replace_char(str(ConfigDefaults.messages), "'", "\"")),
                  "server_tool = {0}\n".format(ConfigDefaults.server_tool),
                  "server_jar_name = {0}\n".format(ConfigDefaults.server_jar_name),
-                 "datetime_format = {0}\n".format(ConfigDefaults.datetime_format),
+                 "backup_folders = {0}\n".format(ConfigDefaults.backup_folder),
                  "sort_backups = {0}\n\n".format(ConfigDefaults.sort_backups),
                  "#Available options for 'server_tool' are 'craftbukkit' and 'spigot'\n",
                  "#Please use consistent names for your server jar file, otherwise the update script might not work properly\n\n",
