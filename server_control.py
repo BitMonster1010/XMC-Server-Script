@@ -56,7 +56,7 @@ class ServerController:
                 time.sleep(0.75)
                 utility.run_command("gzip {0}{1}".format(folder_str, backup_name))
             else:
-                utility.run_command("tar -zcvf {0}{1] {2}".format(folder_str, backup_name, self.config.worlds[0]))
+                utility.run_command("tar -zcvf {0}{1} {2}".format(folder_str, backup_name, self.config.worlds[0]))
 
             if include_announce:
                 self.__console.announce(self.config.l_backup_finished)
