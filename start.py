@@ -13,8 +13,8 @@ os.chdir("../")
 from server_control import ServerController
 from subprocess import getoutput
 
-VERSION = "v1.6-dev4"
-RELEASE_DATE = "2019-07-15"
+VERSION = "v1.6-dev6"
+RELEASE_DATE = "2020-01-04"
 AUTHOR = "XxMoNsTeR"
 
 

@@ -48,15 +48,14 @@ class ServerController:
                 folder_str = path_with_year_and_month + "/"
 
             if self.config.multiworld_support:
-
-                utility.run_command("tar -cvf {0}{1} {2}".format(folder_str, backup_name, self.config.worlds[0]))
+                utility.run_command("tar -cvf {0}{1} \"{2}\"".format(folder_str, backup_name, self.config.worlds[0]))
                 if len(self.config.worlds) > 1:
                     for x in range(1, len(self.config.worlds)):
-                        utility.run_command("tar -uvf {0}{1} {2}".format(folder_str, backup_name, self.config.worlds[x]))
+                        utility.run_command("tar -uvf {0}{1} \"{2}\"".format(folder_str, backup_name, self.config.worlds[x]))
                 time.sleep(0.75)
                 utility.run_command("gzip {0}{1}".format(folder_str, backup_name))
             else:
-                utility.run_command("tar -zcvf {0}{1} {2}".format(folder_str, backup_name, self.config.worlds[0]))
+                utility.run_command("tar -zcvf {0}{1} \"{2}\"".format(folder_str, backup_name, self.config.worlds[0]))
 
             if include_announce:
                 self.__console.announce(self.config.l_backup_finished)
