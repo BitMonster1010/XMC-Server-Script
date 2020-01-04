@@ -22,7 +22,7 @@ class Console:
         if self.__use_broadcast:
             self.broadcast(message)
         else:
-            self.say(message[2:])
+            self.say(message)
 
     def save_all(self):
         self.send_command("save-all")
