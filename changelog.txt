@@ -1,5 +1,12 @@
 --==CHANGELOG for XMC Server Script==--
 
+--v1.6 (2020-03-19):
+    -Added ability to customize start, restart, backup, restoring backup and update messages
+    -Added ability to change datetime format in backup names
+    -Sort backups into year and date folder structure
+    -Server restarts now wait for the terminal screen to be removed before starting the server again
+    -Fixed a bug which caused server to not start
+
 --v1.5 (2017-06-26):
     -Made -b, -s, -r and -a so they can be ran without adding arguments
     -Changed format on how to save the 'worlds' and 'announce_messages'
