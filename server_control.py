@@ -20,7 +20,7 @@ class ServerController:
             utility.xmc_print("Backing up worlds")
             if include_announce:
                 if special_name == "normal":
-                    self.__console.announce(self.config.l_backup);
+                    self.__console.announce(self.config.l_backup)
                 else:
                     self.__console.announce(self.config.l_backup_as.format(special_name))
                 self.__console.announce(self.config.l_saving_world)
@@ -34,6 +34,7 @@ class ServerController:
             folder_str = path_with_special_name + "/"
             time_str = time.strftime(self.config.l_datetime_format)
             backup_name = "backup-{0}.tar".format(time_str)
+            backup_extension = ".gz"
 
             if self.config.sort_backups:
                 year = time.strftime("%Y")
@@ -55,12 +56,12 @@ class ServerController:
                 time.sleep(0.75)
                 utility.run_command("gzip {0}{1}".format(folder_str, backup_name))
             else:
-                utility.run_command("tar -zcvf {0}{1} \"{2}\"".format(folder_str, backup_name, self.config.worlds[0]))
+                utility.run_command("tar -zcvf {0}{1}{2} \"{3}\"".format(folder_str, backup_name, backup_extension, self.config.worlds[0]))
 
             if include_announce:
                 self.__console.announce(self.config.l_backup_finished)
             utility.xmc_print("Successfully backed up worlds!")
-            utility.xmc_print("The backup restore path is: '{0}{1}.gz'".format(folder_str, backup_name))
+            utility.xmc_print("The backup restore path is: '{0}{1}{2}'".format(folder_str, backup_name, backup_extension))
         except IOError as e:
             utility.xmc_print("An unexpected I/O error has occured!", True)
             utility.xmc_print(e, True)
@@ -95,10 +96,12 @@ class ServerController:
     def restart(self, time_to_restart):
         self.__console.announce(self.config.l_restart)
         self.stop(time_to_restart)
+        while utility.is_screen_running(self.config.screen):
+            time.sleep(0.01)
         self.start()
 
     def start(self):
-        utility.run_command("screen -L xmc-screen.log -dmS {0} {1}".format(self.config.screen, self.config.start_server_command))
+        utility.run_command("screen -L -Logfile xmc-screen.log -dmS {0} {1}".format(self.config.screen, self.config.start_server_command))
         self.screen_running = utility.is_screen_running(self.config.screen)
         if self.screen_running:
             utility.xmc_print("Server was started")
